@@ -1,0 +1,36 @@
+# Keil MDK 编译产物
+*.o
+*.d
+*.crf
+*.lnp
+*.dep
+*.htm
+*.map
+*.lst
+*.hex
+*.axf
+*.bin
+*.elf
+*.iex
+*.build_log.htm
+*.scr
+
+# Keil 输出目录
+Listings/
+Output/
+DebugConfig/
+RTE/
+
+# Keil 用户特定配置
+*.uvguix.*
+*.uvoptx
+JLinkLog.txt
+JLinkSettings.ini
+
+# 编辑器临时文件
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.bak

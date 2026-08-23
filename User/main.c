@@ -27,7 +27,7 @@ int16_t EspeedL, EspeedR;
 float pitch, roll, yaw;
 
 // 连续偏航角
-float Total_Yaw = 0.0f;  
+volatile float Total_Yaw = 0.0f;  /* written in main loop, read in TIM1 ISR */
 
 uint8_t R3, R2, R1, M, L3, L2, L1;
 
@@ -39,12 +39,12 @@ float Get_Yaw_Error(float current, float target) {
 //菜单管理
 uint8_t KeyNum;
 uint8_t Press_Count = 0;     
-uint8_t Menu_Select = 1;     
-int Target_Laps = 1;         
-int Run_State = 0;           
+volatile uint8_t Menu_Select = 1;
+volatile int Target_Laps = 1;
+volatile int Run_State = 0;
 
-uint16_t AutoStart_Timer = 300;  
-uint8_t Node_Count = 0;          
+volatile uint16_t AutoStart_Timer = 300;
+volatile uint8_t Node_Count = 0;
 int Corner_Cooldown = 0;         
 uint8_t Node_Active = 0;         
 uint8_t Last_Line_State = 0;     
@@ -74,6 +74,12 @@ int main(void)
 
     while(1)
     {
+        /* NOTE: dt = 0.01f is a CALIBRATED constant, not the measured loop
+           period. All angle constants in Mode 3/4/5 (-19.0f per corner,
+           the Target_Angle table, +47.5f etc.) are tuned against the
+           current loop timing (software I2C + OLED refresh). Do NOT change
+           I2C delays, OLED refresh, or MPU read pattern without
+           recalibrating those angles. */
         GetAngles(&pitch, &roll, &yaw, 0.01f);
         
         // 解包算法
@@ -232,7 +238,7 @@ void TIM1_UP_IRQHandler(void)
                         Node_Count++;
                         Corner_Cooldown = 400; 
                         
-                        if (Node_Count >= Target_Laps * 4) { Run_State = 2; } 
+                        if (Node_Count >= Target_Laps * 4) { Run_State = 2; Beep_Time = 60; }
                     }
                     else if (is_node == 0) Node_Active = 0;
                 } 

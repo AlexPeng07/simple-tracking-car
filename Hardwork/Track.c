@@ -23,11 +23,15 @@ void Track_Init(void)
 void Track_Value(uint8_t* R3, uint8_t* R2, uint8_t* R1, uint8_t* M, uint8_t* L3, uint8_t* L2, uint8_t* L1)
 {
 
-	*R3 = GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_5);
-	*R2 = GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_4);
-	*R1 = GPIO_ReadInputDataBit(GPIOB, GPIO_Pin_3); 
-	*M  = GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_15);
-	*L3 = GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_12);
-	*L2 = GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_11);
-	*L1 = GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_10);
+	/* read each port once so all 7 channels come from the same instant */
+	uint16_t PortA = GPIO_ReadInputData(GPIOA);
+	uint16_t PortB = GPIO_ReadInputData(GPIOB);
+
+	*R3 = (PortB >> 5) & 0x0001;
+	*R2 = (PortB >> 4) & 0x0001;
+	*R1 = (PortB >> 3) & 0x0001;
+	*M  = (PortA >> 15) & 0x0001;
+	*L3 = (PortA >> 12) & 0x0001;
+	*L2 = (PortA >> 11) & 0x0001;
+	*L1 = (PortA >> 10) & 0x0001;
 }
